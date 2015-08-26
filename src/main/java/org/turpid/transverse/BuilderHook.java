@@ -1,32 +1,35 @@
 package org.turpid.transverse;
 
-import java.util.Stack;
+import java.util.HashMap;
+import java.util.Map;
 
 public class BuilderHook implements TraverseHook {
 
 	Buildlet[] buildlets;
-	Object result;
+	Map<Object, Object> result = new HashMap<Object, Object>();
 
 	public BuilderHook(Buildlet... buildlets) {
 		this.buildlets = buildlets;
 	}
 
 	@Override
-	public void handle(Object in, Object p, Stack stackIn, Class cli, Class clp) {
-		Object r;
+	public void handle(Object in) {
 		for (Buildlet b : buildlets) {
 			try {
-				r = b.build(in, p, stackIn, cli, null, clp);
-				if (p instanceof Traverselet.Root)
-					result = r;
+				Object r = b.build(in);
+				result.put(in, r);
 			} catch (ClassCastException e) {
 				// nop
 			}
 		}
 	}
 
-	public <T> T getResult(Class<T> cls) {
-		return cls.cast(result);
+	public <T> T getResult(Object in, Class<T> cls) {
+		return cls.cast(result.get(in));
+	}
+
+	public Map<Object, Object> getResults() {
+		return result;
 	}
 
 }

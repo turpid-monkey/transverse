@@ -1,9 +1,7 @@
 package org.turpid.transverse;
 
-import java.util.Stack;
 
 @FunctionalInterface
-public interface Buildlet<In, Out, Parent> {
-	Out build(In in, Parent p, Stack<?> stackIn, Class<In> cli, Class<Out> clo,
-			Class<Parent> clp);
+public interface Buildlet<In, Out> {
+	Out build(In in);
 }

@@ -1,9 +1,8 @@
 package org.turpid.transverse;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
-import org.turpid.transverse.ValidationHook.Validatelet;
 
 public class ValidationTest {
 
@@ -13,10 +12,9 @@ public class ValidationTest {
 			for (int i = 0; i < in.length(); i++)
 				ctx.traverse(in.charAt(i));
 		};
-		Validatelet<Character, String> v1 = (in, parent, stack, cli, clo, clp) -> {
+		Validatelet<Character> v1 = (in, ctx) -> {
 			if (in == 'a')
-				return new ValidationHook.ValidationMessage("No 'a' allowed");
-			return null;
+				ctx.fail("No 'a' allowed");
 		};
 		ValidationHook hook = new ValidationHook(v1);
 		CompositeTraverse traverse = new CompositeTraverse(hook, t1);

@@ -13,7 +13,7 @@ public class CompositeTransform {
 		for (@SuppressWarnings("rawtypes")
 		Transformlet t : transformations) {
 			try {
-				Out r = clo.cast(t.transform(in, cli, clo, this));
+				Out r = clo.cast(t.transform(in, this));
 				return r;
 			} catch (ClassCastException e) {
 				System.out

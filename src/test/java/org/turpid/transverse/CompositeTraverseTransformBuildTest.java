@@ -1,6 +1,6 @@
 package org.turpid.transverse;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,13 +11,13 @@ import org.junit.Test;
 public class CompositeTraverseTransformBuildTest {
 
 	static Transformlet<Integer, String> integerToString() {
-		return (in, cli, clo, ctx) -> {
+		return (in, ctx) -> {
 			return in.toString();
 		};
 	}
 
 	static Transformlet<List<Integer>, List<String>> listToList() {
-		return (in, cli, clo, ctx) -> {
+		return (in, ctx) -> {
 			List<String> r = new ArrayList<String>();
 			for (Integer i : in) {
 				r.add(ctx.transform(i, Integer.class, String.class));
@@ -61,12 +61,12 @@ public class CompositeTraverseTransformBuildTest {
 		Traverselet<String> t1 = (in, ctx) -> {
 			ctx.traverse(in.length());
 		};
-		Buildlet<String, List, Traverselet.Root> b1 = (in, p, stack, cli, clo, clp) -> {
+		Buildlet<String, List> b1 = (in) -> {
 			List<String> res = new ArrayList();
 			res.add(in);
 			return res;
 		};
-		Buildlet<Integer, List, String> b2 = (in, p, stack, cli, clo, clp) -> {
+		Buildlet<Integer, List> b2 = (in) -> {
 			List<Integer> res = new ArrayList();
 			res.add(in);
 			return res;
@@ -74,8 +74,10 @@ public class CompositeTraverseTransformBuildTest {
 		BuilderHook hook = new BuilderHook(b1, b2);
 		CompositeTraverse ct = new CompositeTraverse(hook, t1);
 		ct.traverse("Hello");
-		List res = hook.getResult(List.class);
+		List res = hook.getResult("Hello", List.class);
 		assertEquals("Hello", res.get(0));
+		res = hook.getResult(5, List.class);
+		assertEquals(5, res.get(0));
 
 	}
 }
