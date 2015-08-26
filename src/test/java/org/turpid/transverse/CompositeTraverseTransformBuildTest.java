@@ -1,6 +1,5 @@
 package org.turpid.transverse;
 
-
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
@@ -29,8 +28,8 @@ public class CompositeTraverseTransformBuildTest {
 
 	@Test
 	public void testTransformation() {
-		CompositeTransform tf = new CompositeTransform(
-				integerToString(), listToList());
+		CompositeTransform tf = new CompositeTransform(integerToString(),
+				listToList());
 		String s = tf
 				.transform(Integer.valueOf(5), Integer.class, String.class);
 		assertEquals("5", s);
@@ -62,7 +61,7 @@ public class CompositeTraverseTransformBuildTest {
 		Traverselet<String> t1 = (in, ctx) -> {
 			ctx.traverse(in.length());
 		};
-		Buildlet<String, List, Buildlet.Root> b1 = (in, p, stack, cli, clo, clp) -> {
+		Buildlet<String, List, Traverselet.Root> b1 = (in, p, stack, cli, clo, clp) -> {
 			List<String> res = new ArrayList();
 			res.add(in);
 			return res;
@@ -72,10 +71,10 @@ public class CompositeTraverseTransformBuildTest {
 			res.add(in);
 			return res;
 		};
-		CompositeTraverse ct = new CompositeTraverse(new CompositeBuild(b1),
-				t1);
+		BuilderHook hook = new BuilderHook(b1, b2);
+		CompositeTraverse ct = new CompositeTraverse(hook, t1);
 		ct.traverse("Hello");
-		List res = ct.getResult(List.class);
+		List res = hook.getResult(List.class);
 		assertEquals("Hello", res.get(0));
 
 	}

@@ -4,27 +4,26 @@ import java.util.Stack;
 
 public class CompositeTraverse {
 	Traverselet[] traverselets;
-	Buildlet builder = (in, p, stack, cli, clo, clp) -> {
-		return null;
-	};
-	Stack<Object> stack = new Stack<Object>();
-	Object result;
+	TraverseHook hook;
+	final Stack<Object> stack = new Stack<Object>();
+	final static Object ROOT = new Traverselet.Root();
 
 	CompositeTraverse(Traverselet... traverselets) {
 		this.traverselets = traverselets;
-		stack.push(new Buildlet.Root());
+		stack.push(ROOT);
 	}
 
-	public CompositeTraverse(Buildlet builder, Traverselet... traverselets) {
+	public CompositeTraverse(TraverseHook hook, Traverselet... traverselets) {
 		this(traverselets);
-		this.builder = builder;
+		this.hook = hook;
 	}
 
-	void traverse(Object in) {
+	public void traverse(Object in) {
 		Object parent = stack.peek();
 		stack.push(in);
-		Object result = builder.build(in, parent, stack, in.getClass(), null,
-				stack.peek().getClass());
+		if (hook != null)
+			hook.handle(in, parent, stack, in.getClass(), stack.peek()
+					.getClass());
 		for (Traverselet t : traverselets) {
 			try {
 				t.traverse(in, this);
@@ -32,13 +31,6 @@ public class CompositeTraverse {
 				// nope
 			}
 		}
-		if (result != null)
-			this.result = result;
 		stack.pop();
 	}
-
-	public <T> T getResult(Class<T> clo) {
-		return clo.cast(result);
-	}
-
 }
